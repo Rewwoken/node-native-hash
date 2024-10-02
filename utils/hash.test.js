@@ -4,8 +4,18 @@ import { hashPassword, validatePassword } from './hash.js';
 
 const password = 'foo';
 const wrongPassword = password + 'bar';
+// TODO: improve params validation
+const phcRegexp = /^\$scrypt\$.*\$.{43}\$.{86}$/;
 
 describe('Password hashing and validation', () => {
+	it('should return valid phc string', async () => {
+		const phcString = await hashPassword(password);
+		const invalidPhcString = phcString + 'baz';
+
+		assert.match(phcString, phcRegexp);
+		assert.doesNotMatch(invalidPhcString, phcRegexp);
+	});
+
 	it('should validate a correct password against its hash', async () => {
 		const phcString = await hashPassword(password);
 		const isValid = await validatePassword(password, phcString);
